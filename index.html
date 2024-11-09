@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style.css">
+    <title>KING YT Site</title>
+    <style>
+        /* خصائص الجسم الأساسي */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        /* خلفية الفيديو */
+        video.background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        /* تعديل الـ Modal الترحيب */
+        .welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+            transition: opacity 1s ease-in-out;
+            opacity: 1;
+        }
+
+        /* تعديل النص */
+        .welcome-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        /* تعديل الصورة */
+        .welcome-image {
+            width: 30px;  /* تصغير عرض الصورة */
+            height: auto;  /* الحفاظ على النسبة بين العرض والطول */
+            margin-bottom: 10px;
+            outline: none;
+            border: none;
+        }
+
+        /* الأزرار الرئيسية */
+        .container {
+            visibility: hidden; /* مخفية أثناء ظهور عبارة الترحيب */
+            transition: visibility 1s ease-in-out;
+        }
+
+        /* زر كبير (الزر الأصلي) */
+        .rectangular-button {
+            background-color: transparent;
+            border: none;
+            position: absolute;
+            left: 35%;
+            top: 67%;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 10;
+            padding: 0;
+        }
+
+        .rectangular-button img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+
+        .rectangular-button:hover {
+            background-color: darkgray;
+        }
+
+        /* زر جديد */
+        .new-button {
+            background-color: transparent;
+            border: none;
+            position: absolute;
+            left: 70%; /* تحديد موقعه أفقياً */
+            top: 53%; /* تحديد موقعه عمودياً */
+            width: 120px; /* زيادة حجم الزر */
+            height: 120px; /* زيادة حجم الزر */
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 10;
+            padding: 0;
+        }
+
+        .new-button img {
+            width: 80px;  /* زيادة حجم الصورة داخل الزر */
+            height: 80px;  /* زيادة حجم الصورة داخل الزر */
+            border-radius: 50%;
+        }
+
+        .new-button:hover {
+            background-color: darkgray;
+        }
+
+        /* صف الأزرار السفلية */
+        .button-row {
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            left: 10px;
+            z-index: 5;
+        }
+
+        .button {
+            padding: 8px;
+            background-color: transparent;
+            border-radius: 50%;
+            text-align: center;
+            width: 50px;
+            margin: 0 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: none;
+        }
+
+        .button img {
+            width: 60px;
+            height: 50px;
+            border-radius: 50%;
+            margin-top: 5px;
+            border: none;
+        }
+
+        .button:hover {
+            background-color: darkgray;
+        }
+
+        /* الواجهة الجديدة للمهام مع خلفية */
+        .task-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:  #333;
+            display: none; /* مخفية في البداية */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            color: white;
+            padding: 20px;
+        }
+
+        /* زر Task 1 */
+        .task-button {
+            padding: 20px 40px;
+            font-size: 24px;
+            background: linear-gradient(90deg, red 50%, purple 50%);  /* تغيير background-color إلى background */
+            color: white;
+            border: none;
+            top: 0%;
+            position: absolute;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s;  /* تغيير من background-color إلى background */
+            width: 500px;
+        }
+
+        .task-button:hover {
+            background-color: #45a049;
+        }
+
+        /* إضافة عدد النقاط في أعلى يسار الشاشة */
+        .points {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 20;
+        }
+
+        /* العداد الزمني (مخفي في الواجهة الرئيسية، يظهر فقط في واجهة المهام) */
+        .countdown-timer {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 20;
+            display: none; /* مخفي بشكل افتراضي */
+        }
+
+    </style>
+</head>
+<body>
+    <video autoplay loop muted class="background">
+        <source src="بعد الخيره.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="welcome-modal" id="welcome-modal">
+        <img src="لتلتال.jpg" alt="Coin" class="welcome-image">
+        <h2 class="welcome-message">WELCOME TO KING YT</h2>
+        <p>مرحبا بك في موقع KING YT</p> <!-- عبارة الترحيب المضافة -->
+    </div>
+
+    <!-- عرض النقاط في أعلى يسار الشاشة -->
+    <div class="points" id="user-points">
+        نقاطك: 100
+    </div>
+
+    <div class="container" id="main-container">
+        <!-- الزر الكبير (الأصلي) -->
+        <div class="rectangular-button" onclick="window.location.href='https://king90.socpanel.com'">
+            <img src="زرار الاحالت.jpg" alt="Go to Site">
+        </div>
+
+        <!-- الزر الجديد -->
+        <div class="new-button" onclick="openNewInterface()">
+            <img src="uyim;l.jpg" alt="New Button">
+        </div>
+
+        <!-- الأزرار السفلية -->
+        <div class="button-row">
+            <div class="button" onclick="openTelegram()">
+                <img src="تليجرام اسود احا.jpg" alt="Telegram">
+            </div>
+            <div class="button" onclick="openYouTube()">
+                <img src="حسين عادل.jpg" alt="YouTube">
+            </div>
+            <div class="button" onclick="openX()">
+                <img src="تويترننن.png" alt="X">
+            </div>
+        </div>
+    </div>
+
+    <!-- واجهة المهام الجديدة مع خلفية -->
+    <div class="task-interface" id="task-interface">
+        <h2>إضافة مهام جديدة</h2>
+
+        <!-- زر Task 1 -->
+        <button class="task-button" onclick="redirectToBot()">Task 1</button>
+
+        <!-- يمكنك إضافة عناصر أخرى حسب الحاجة -->
+        <button onclick="closeTaskInterface()">إغلاق</button>
+
+        <!-- العداد الزمني يظهر فقط في واجهة المهام -->
+        <div id="countdown" class="countdown-timer"></div>
+    </div>
+
+    <script>
+        // إخفاء عبارة الترحيب بعد 3 ثواني وإظهار الأزرار الرئيسية
+        setTimeout(function() {
+            document.getElementById("welcome-modal").style.display = "none";
+            document.getElementById("main-container").style.visibility = "visible";
+        }, 3000);
+
+        // دالة لتصفير النقاط عند الساعة 5 صباحًا
+        function resetPointsAtFiveAM() {
+            const currentTime = new Date();
+            if (currentTime.getHours() === 5 && currentTime.getMinutes() === 0) {
+                document.getElementById("user-points").textContent = 'نقاطك: 0';
+            }
+        }
+
+        setInterval(resetPointsAtFiveAM, 60000); // التحقق كل دقيقة
+
+        // فتح واجهة المهام
+        function openNewInterface() {
+            document.getElementById("task-interface").style.display = "flex";
+            startCountdown();
+        }
+
+        // إغلاق واجهة المهام
+        function closeTaskInterface() {
+            document.getElementById("task-interface").style.display = "none";
+        }
+
+        // فتح رابط تليجرام
+        function openTelegram() {
+            window.open("https://t.me/sokayna2022", "_blank");
+        }
+
+        // فتح رابط يوتيوب
+        function openYouTube() {
+            window.open("https://youtube.com/@kingyoutube-2024?si=SM0FKFNIWBFeWk7u", "_blank");
+        }
+
+        // فتح رابط تويتر (X)
+        function openX() {
+            window.open("https://x.com/KrbtYwsf17613", "_blank");
+        }
+
+        // دالة لتوجيه المستخدم إلى البوت
+        function redirectToBot() {
+            window.location.href = "https://t.me/KingYT_Bot";
+        }
+
+        // العداد الزمني (Countdown)
+        function startCountdown() {
+            let timeRemaining = 60 * 5; // 5 دقائق بالثواني
+            const countdownElement = document.getElementById("countdown");
+
+            function updateCountdown() {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                countdownElement.textContent = `الوقت المتبقي: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timeRemaining--;
+
+                if (timeRemaining < 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.textContent = "انتهى الوقت!";
+                }
+            }
+
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            countdownElement.style.display = "block"; // إظهار العداد الزمني عند بدء المهام
+        }
+    </script>
+</body>
+</html>
